@@ -11,39 +11,62 @@ let app = http.createServer(function(request,response){
     // console.log(queryData);// http://localhost:3000/?id=HTML 입력시  {id : 'HTML'} 출력 
     //                           -> queryData의 변수에 담긴 값들은 객체.
     // console.log(queryData.id);// HTML 출력
-    let title = queryData.id;
     
+    
+    if(pathname == '/'){
+        if(queryData.id == undefined){
+                let title = 'Welcome'
+                let description = 'Hello, Node.js'
+                let template = `
+                <!doctype html>
+                <html>
+                    <head>
+                        <title>WEB1 - ${title}</title>
+                        <meta charset="utf-8">
+                    </head>
+                    <body>
+                        <h1><a href="/">WEB</a></h1>
+                        <ol>
+                            <li><a href="/?id=HTML">HTML</a></li>
+                            <li><a href="/?id=CSS">CSS</a></li>
+                            <li><a href="/?id=JavaScript">JavaScript</a></li>
+                        </ol>
+                        <h2>${title}</h2>
+                        <p>${description}</p>
+                    </body>
+                </html>
+                `
+                response.writeHead(200); //파일을 성공적으로 전송하면 웹서버는 200이라는 약속된 번호를 돌려준다
+                response.end(template); //주소입력값(쿼리스트링)의 id값을 화면에 출력함
 
-    if(pathname==-'/'){
-        fs.readFile(`data/${title}`, 'utf8', function(err, description){
-            let template = `
-            <!doctype html>
-            <html>
-                <head>
-                    <title>WEB1 - ${title}</title>
-                    <meta charset="utf-8">
-                </head>
-                <body>
-                    <h1><a href="/">WEB</a></h1>
-                    <ol>
-                        <li><a href="/?id=HTML">HTML</a></li>
-                        <li><a href="/?id=CSS">CSS</a></li>
-                        <li><a href="/?id=JavaScript">JavaScript</a></li>
-                    </ol>
-                    <h2>${title}</h2>
-                    <p>${description}</p>
-                </body>
-            </html>
-            `
-            // console.log(__dirname + url);
-            
-            // response.end(fs.readFileSync(__dirname + _url));
-            // response.end('egoing : '+url); //egoing : /3.html을 화면에 출력함
-            response.writeHead(200); //200은 파일을 성공적으로 전송했다
-            response.end(template); //주소입력값(쿼리스트링)의 id값을 화면에 출력함
-        });
+        }else{
+            fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+                let title = queryData.id;
+                let template = `
+                <!doctype html>
+                <html>
+                    <head>
+                        <title>WEB1 - ${title}</title>
+                        <meta charset="utf-8">
+                    </head>
+                    <body>
+                        <h1><a href="/">WEB</a></h1>
+                        <ol>
+                            <li><a href="/?id=HTML">HTML</a></li>
+                            <li><a href="/?id=CSS">CSS</a></li>
+                            <li><a href="/?id=JavaScript">JavaScript</a></li>
+                        </ol>
+                        <h2>${title}</h2>
+                        <p>${description}</p>
+                    </body>
+                </html>
+                `
+                response.writeHead(200);
+                response.end(template); 
+            });
+        }
     }else{
-        response.writeHead(404); //파일을 찾을 수 없으면 404
+        response.writeHead(404); //파일을 찾을 수 없으면 웹서버는 404라는 약속된 번호를 돌려준다
         response.end('Not found');
     }
     
