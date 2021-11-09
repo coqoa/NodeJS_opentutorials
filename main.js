@@ -91,11 +91,11 @@ let app = http.createServer(function(request,response){
             let post = qs.parse(body);
             let title = post.title;
             let description = post.description;
-
+            fs.writeFile(`data/${title}`, description, 'utf8', function(err){
+                response.writeHead(302, {Location: `/?id=${title}`});
+                response.end();
+            })
         });
-        response.writeHead(200); //파일을 성공적으로 전송하면 웹서버는 200이라는 약속된 번호를 돌려준다
-        response.end('success');
-
     }else{
         response.writeHead(404); //파일을 찾을 수 없으면 웹서버는 404라는 약속된 번호를 돌려준다
         response.end('Not found');
