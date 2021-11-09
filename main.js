@@ -13,6 +13,7 @@ function templateHTML(title, list, body){
         <body>
             <h1><a href="/">WEB</a></h1>
             ${list}
+            <a href="/create">create</a>
             ${body}
         </body>
     </html>
@@ -65,6 +66,21 @@ let app = http.createServer(function(request,response){
                 });
             });
         }
+    }else if(pathname == '/create'){
+        fs.readdir('./data', function(error, filelist){// 배열의 형태로 출력
+            let list = templateList(filelist);
+            let title = 'WEB - create'
+            let template = templateHTML(title, list, `
+            <form action="http://localhost:3000/process_create" method="post">
+                <input type="text" name="title" placeholder="title"><br>
+                <textarea name="description" placeholder="description"></textarea><br>
+                <input type="submit"><br>
+            </form>
+            `);
+            
+            response.writeHead(200); //파일을 성공적으로 전송하면 웹서버는 200이라는 약속된 번호를 돌려준다
+            response.end(template); //주소입력값(쿼리스트링)의 id값을 화면에 출력함
+        })
     }else{
         response.writeHead(404); //파일을 찾을 수 없으면 웹서버는 404라는 약속된 번호를 돌려준다
         response.end('Not found');
