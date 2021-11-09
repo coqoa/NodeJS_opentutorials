@@ -1,6 +1,7 @@
 let http = require('http');
 let fs = require('fs');
 let url = require('url'); //url이라는변수로 url모듈을 사용할 것이다.
+let qs = require('querystring');
 
 function templateHTML(title, list, body){
     return `
@@ -71,7 +72,7 @@ let app = http.createServer(function(request,response){
             let list = templateList(filelist);
             let title = 'WEB - create'
             let template = templateHTML(title, list, `
-            <form action="http://localhost:3000/process_create" method="post">
+            <form action="http://localhost:3000/create_process" method="post">
                 <input type="text" name="title" placeholder="title"><br>
                 <textarea name="description" placeholder="description"></textarea><br>
                 <input type="submit"><br>
@@ -81,6 +82,20 @@ let app = http.createServer(function(request,response){
             response.writeHead(200); //파일을 성공적으로 전송하면 웹서버는 200이라는 약속된 번호를 돌려준다
             response.end(template); //주소입력값(쿼리스트링)의 id값을 화면에 출력함
         })
+    }else if(pathname == '/create_process'){
+        let body = '';
+        request.on('data', function(data){
+            body = body + data;
+        });
+        request.on('end', function(){
+            let post = qs.parse(body);
+            let title = post.title;
+            let description = post.description;
+
+        });
+        response.writeHead(200); //파일을 성공적으로 전송하면 웹서버는 200이라는 약속된 번호를 돌려준다
+        response.end('success');
+
     }else{
         response.writeHead(404); //파일을 찾을 수 없으면 웹서버는 404라는 약속된 번호를 돌려준다
         response.end('Not found');
@@ -89,4 +104,6 @@ let app = http.createServer(function(request,response){
 });
 app.listen(3000);  
 
+// request : 요청할때 웹브라우저가 보낸 정보
+// response : 응답할때 웹브라우저에 전송할 정보
 // require : 요구하다
