@@ -4,6 +4,7 @@ let url = require('url'); //url이라는변수로 url모듈을 사용할 것이�
 let qs = require('querystring');
 
 let template = require('./lib/template.js');
+const path = require('path/posix');
 let app = http.createServer(function(request,response){
     let _url = request.url;
     // console.log(_url); // queryString을 알아낼 수 있다.
@@ -27,9 +28,10 @@ let app = http.createServer(function(request,response){
             })
         }else{
             fs.readdir('./data', function(error, filelist){// 배열의 형태로 출력  
-                let list = template.list(filelist);
-                fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+                let filteredId = path.parse(queryData.id).base;
+                fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
                     let title = queryData.id;
+                    let list = template.list(filelist);
                     let html = template.HTML(title, list,
                         `<h2>${title}</h2>${description}`,
                         `<a href="/create">create</a>
@@ -77,8 +79,8 @@ let app = http.createServer(function(request,response){
     }else if(pathname == '/update'){
         fs.readdir('./data', function(error, filelist){// 배열의 형태로 출력  
             let list = template.list(filelist);
-
-            fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description){
+            let filteredId = path.parse(queryData.id).base;
+            fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
                 let title = queryData.id;
                 let html = template.HTML(title, list,
                     `
@@ -120,7 +122,8 @@ let app = http.createServer(function(request,response){
         request.on('end', function(){
             let post = qs.parse(body);
             let id = post.id;
-            fs.unlink(`data/${id}`, function(error){
+            let filteredId = path.parse(id).base;
+            fs.unlink(`data/${filteredId}`, function(error){
                 response.writeHead(302, {Location: `/`});
                 response.end();
             })
