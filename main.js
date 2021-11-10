@@ -2,9 +2,10 @@ let http = require('http');
 let fs = require('fs');
 let url = require('url'); //url이라는변수로 url모듈을 사용할 것이다.
 let qs = require('querystring');
-
 let template = require('./lib/template.js');
 const path = require('path/posix');
+let sanitizeHtml = require('sanitize-html');
+
 let app = http.createServer(function(request,response){
     let _url = request.url;
     // console.log(_url); // queryString을 알아낼 수 있다.
@@ -31,13 +32,15 @@ let app = http.createServer(function(request,response){
                 let filteredId = path.parse(queryData.id).base;
                 fs.readFile(`data/${filteredId}`, 'utf8', function(err, description){
                     let title = queryData.id;
+                    let sanitizedTitle = sanitizeHtml(title);
+                    let sanitizedDescription = sanitizeHtml(description, {allowedTags:['h1']});
                     let list = template.list(filelist);
-                    let html = template.HTML(title, list,
-                        `<h2>${title}</h2>${description}`,
+                    let html = template.HTML(sanitizedTitle, list,
+                        `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
                         `<a href="/create">create</a>
-                        <a href="/update?id=${title}">update</a>
+                        <a href="/update?id=${sanitizedTitle}">update</a>
                         <form action="/delete_process" method="post" onsubmit="정말삭제하겠습니까">
-                            <input type="hidden" name="id" value="${title}">
+                            <input type="hidden" name="id" value="${sanitizedTitle}">
                             <input type="submit" value="delete">
                         </form>`
                     );
